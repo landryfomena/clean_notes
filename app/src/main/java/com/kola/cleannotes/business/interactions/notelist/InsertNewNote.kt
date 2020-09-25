@@ -1,12 +1,14 @@
 package com.kola.cleannotes.business.interactions.notelist
 
-import android.view.View
+import com.kola.cleannotes.business.data.cache.CacheResponseHandler
 import com.kola.cleannotes.business.data.cache.abstraction.NoteCacheDataSource
 import com.kola.cleannotes.business.data.network.abstraction.NoteNetworkDataSource
+import com.kola.cleannotes.business.data.util.safeCacheCall
 import com.kola.cleannotes.business.domain.model.Note
 import com.kola.cleannotes.business.domain.model.NoteFactory
 import com.kola.cleannotes.business.domain.state.*
 import com.kola.cleannotes.framework.presentation.notelist.state.NoteListViewState
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
@@ -28,49 +30,61 @@ class InsertNewNote(
             body = ""
         )
 
-        val cacheResult = noteCacheDataSource.insertNote(newNote)
-        var cacheResponse:DataState<NoteListViewState>?= null
-        if(cacheResult>0){
-            val viewState = NoteListViewState(
-                newNote = newNote
-            )
-
-            cacheResponse = DataState.data(
-                response = Response(
-                    message = INSERT_NOTE_SUCESS,
-                    uiComponentType = UIComponentType.Toast(),
-                    messageType = MessageType.Success()
-                ),
-                data = viewState,
-                stateEvent = stateEvent
-            )
-
-
-        }
-        else{
-            cacheResponse = DataState.data( response = Response(
-                message = INSERT_NOTE_SUCESS,
-                uiComponentType = UIComponentType.Toast(),
-                messageType = MessageType.Success()
-            ),
-                data = null,
-                stateEvent = stateEvent
-            )
+        val cacheResult = safeCacheCall(IO) {
+            noteCacheDataSource.insertNote(newNote)
         }
 
-      emit(cacheResponse)
-        updateNetwork(cacheResponse.stateMessage?.response?.message?:"",newNote)
+        val cacheResponse = object : CacheResponseHandler<NoteListViewState, Long>(
+            response = cacheResult,
+            stateEvent = stateEvent
+        ) {
+            override suspend fun handleSuccess(resultObj: Long): DataState<NoteListViewState>? {
+                return if (resultObj > 0) {
+                    val viewState = NoteListViewState(
+                        newNote = newNote
+                    )
+
+                   DataState.data(
+                        response = Response(
+                            message = INSERT_NOTE_SUCESS,
+                            uiComponentType = UIComponentType.Toast(),
+                            messageType = MessageType.Success()
+                        ),
+                        data = viewState,
+                        stateEvent = stateEvent
+                    )
+
+
+                } else {
+                    DataState.data(
+                        response = Response(
+                            message = INSERT_NOTE_SUCESS,
+                            uiComponentType = UIComponentType.Toast(),
+                            messageType = MessageType.Success()
+                        ),
+                        data = null,
+                        stateEvent = stateEvent
+                    )
+                }
+            }
+        }.getResult()
+
+
+
+
+        emit(cacheResponse)
+        updateNetwork(cacheResponse?.stateMessage?.response?.message ?: "", newNote)
     }
 
-    private suspend fun updateNetwork(cacheResponse:String?,newNote: Note){
-        if (cacheResponse.equals(INSERT_NOTE_SUCESS)){
+    private suspend fun updateNetwork(cacheResponse: String, newNote: Note) {
+        if (cacheResponse.equals(INSERT_NOTE_SUCESS)) {
             noteNetworkDataSource.insertOrUpdateNote(newNote)
         }
 
     }
 
-    companion object{
+    companion object {
         const val INSERT_NOTE_SUCESS = " successfully inserted new note "
-        const val  INSERT_NEW_NOTE_FAILED= " failed to insert new note "
+        const val INSERT_NEW_NOTE_FAILED = " failed to insert new note "
     }
 }
