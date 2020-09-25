@@ -2,12 +2,13 @@ package com.kola.cleannotes.business.data.network.implementation
 
 import com.kola.cleannotes.business.data.network.abstraction.NoteNetworkDataSource
 import com.kola.cleannotes.business.domain.model.Note
+import com.kola.cleannotes.framework.datasource.network.abstraction.NoteFirestoreService
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class NoteNetworkDataSourceImpl @Inject constructor(
-    private val firestoreService: NoteFireStoreService
+    private val firestoreService: NoteFirestoreService
 ) : NoteNetworkDataSource {
     override suspend fun insertOrUpdateNote(note: Note) = firestoreService.insertOrUpdateNote(note)
     override suspend fun deleteNote(primaryKey: String) = firestoreService.deleteNote(primaryKey)

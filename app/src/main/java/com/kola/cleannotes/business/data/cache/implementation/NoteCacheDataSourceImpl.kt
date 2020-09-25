@@ -2,6 +2,7 @@ package com.kola.cleannotes.business.data.cache.implementation
 
 import com.kola.cleannotes.business.data.cache.abstraction.NoteCacheDataSource
 import com.kola.cleannotes.business.domain.model.Note
+import com.kola.cleannotes.framework.datasource.cache.abstraction.NoteDaoService
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,10 +17,10 @@ class NoteCacheDataSourceImpl @Inject constructor(
     override suspend fun deleteNotes(notes: List<Note>) = noteDaoService.deleteNotes(notes)
 
     override suspend fun updateNote(primaryKey: String, newTitle: String, newBody: String) =
-        noteDaoService.update(primaryKey, newTitle, newBody)
+        noteDaoService.updateNote(primaryKey, newTitle, newBody)
 
-    override suspend fun searchNote(query: String, filterAndOrder: String, page: Int)= noteDaoService.searchNote(query,filterAndOrder,page)
-    override suspend fun searchNoteById(primaryKey: String)=noteDaoService.searchById(primaryKey)
+    override suspend fun searchNote(query: String, filterAndOrder: String, page: Int)= noteDaoService.returnOrderedQuery(query,filterAndOrder,page)
+    override suspend fun searchNoteById(primaryKey: String)=noteDaoService.searchNoteById(primaryKey)
 
     override suspend fun getNumNotes()=noteDaoService.getNumNotes()
 

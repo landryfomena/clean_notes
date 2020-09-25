@@ -1,4 +1,4 @@
-package com.kola.cleannotes.framework
+package com.kola.cleannotes.framework.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
