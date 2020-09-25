@@ -1,12 +1,4 @@
-import dependencies.AnnotationProcessing
-import dependencies.Java
-import dependencies.SupportDependencies
-import dependencies.Versions
-import dependencies.Application
-import dependencies.Dependencies
-import dependencies.AndroidTestDependencies
-import groovyjarjarantlr.Version
-
+import dependencies.*
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -28,7 +20,7 @@ android {
     }
 
     buildTypes {
-        debug{
+        debug {
             minifyEnabled false
         }
         release {
@@ -37,13 +29,18 @@ android {
         }
     }
 
-    compileOptions{
+    compileOptions {
         sourceCompatibility = Java.java_version
-        targetCompatibility= Java.java_version
+        targetCompatibility = Java.java_version
     }
 
-    kotlinOptions{
-        jvmTarget= Java.java_version
+    kotlinOptions {
+        jvmTarget = Java.java_version
+    }
+    testOptions {
+        unitTests.all {
+            useJunitPlatform()
+        }
     }
 }
 
@@ -76,9 +73,11 @@ dependencies {
     //annotation processing
     implementation AnnotationProcessing.dagger_compiler
 
-    //test
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    //Unit test
+    testImplementation TestDependencies.mockk
+    testImplementation TestDependencies.jupiter_api
+    testImplementation TestDependencies.jupiter_params
+    testImplementation TestDependencies.junit4
+    testRuntimeOnly TestDependencies.jupiter_engine
 
 }

@@ -13,6 +13,7 @@ interface NoteNetworkDataSource {
     suspend fun searchNote(note: Note): Note?
     suspend fun getAllNotes(): List<Note>
     suspend fun insertOrUpdateNotes(notes: List<Note>)
-
+    suspend fun deleteDeletedNote(note: Note)
+    suspend fun deleteAllNotes()
 
 }
