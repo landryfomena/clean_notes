@@ -1,3 +1,4 @@
+import dependencies.AnnotationProcessing
 import dependencies.Java
 import dependencies.SupportDependencies
 import dependencies.Versions
@@ -60,6 +61,16 @@ dependencies {
     implementation SupportDependencies.constraintlayout
     implementation SupportDependencies.material_design
     implementation SupportDependencies.swipe_refresh_layout
+
+    //dependencies
+    implementation Dependencies.dagger
+    implementation Dependencies.firebase_firestore
+    implementation Dependencies.firebase_analytics
+    implementation Dependencies.firebase_auth
+    implementation Dependencies.firebase_crashlytics
+
+    //annotation processing
+    implementation AnnotationProcessing.dagger_compiler
 
     //test
     testImplementation 'junit:junit:4.12'
