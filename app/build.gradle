@@ -71,7 +71,7 @@ dependencies {
     implementation Dependencies.retrofit_gson
 
     //annotation processing
-    implementation AnnotationProcessing.dagger_compiler
+    annotationProcessor AnnotationProcessing.dagger_compiler
 
     //Unit test
     testImplementation TestDependencies.mockk

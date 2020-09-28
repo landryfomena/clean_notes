@@ -3,11 +3,13 @@ package com.kola.cleannotes.framework.presentation.notelist.state
 import com.kola.cleannotes.business.domain.model.Note
 import com.kola.cleannotes.business.domain.state.StateEvent
 import com.kola.cleannotes.business.domain.state.StateMessage
+import okhttp3.RequestBody
 
 sealed class NoteListStateEvent: StateEvent {
 
     class InsertNewNoteEvent(
-        val title: String
+        val title: String,
+        val body: String
     ): NoteListStateEvent() {
 
         override fun errorInfo(): String {

@@ -31,4 +31,11 @@ class NoteNetworkDataSourceImpl @Inject constructor(
 
     override suspend fun insertOrUpdateNotes(notes: List<Note>) =
         firestoreService.insertOrUpdateNotes(notes)
+
+    override suspend fun deleteDeletedNote(note: Note) {
+
+    }
+
+    override suspend fun deleteAllNotes() {
+    }
 }

@@ -46,7 +46,7 @@ class InsertNewNote(
 
                    DataState.data(
                         response = Response(
-                            message = INSERT_NOTE_SUCESS,
+                            message = INSERT_NOTE_SUCCESS,
                             uiComponentType = UIComponentType.Toast(),
                             messageType = MessageType.Success()
                         ),
@@ -58,7 +58,7 @@ class InsertNewNote(
                 } else {
                     DataState.data(
                         response = Response(
-                            message = INSERT_NOTE_SUCESS,
+                            message = INSERT_NOTE_SUCCESS,
                             uiComponentType = UIComponentType.Toast(),
                             messageType = MessageType.Success()
                         ),
@@ -77,14 +77,14 @@ class InsertNewNote(
     }
 
     private suspend fun updateNetwork(cacheResponse: String, newNote: Note) {
-        if (cacheResponse.equals(INSERT_NOTE_SUCESS)) {
+        if (cacheResponse.equals(INSERT_NOTE_SUCCESS)) {
             noteNetworkDataSource.insertOrUpdateNote(newNote)
         }
 
     }
 
-    companion object {
-        const val INSERT_NOTE_SUCESS = " successfully inserted new note "
-        const val INSERT_NEW_NOTE_FAILED = " failed to insert new note "
+    companion object{
+        val INSERT_NOTE_SUCCESS = "Successfully inserted new note."
+        val INSERT_NOTE_FAILED = "Failed to insert new note."
     }
 }
