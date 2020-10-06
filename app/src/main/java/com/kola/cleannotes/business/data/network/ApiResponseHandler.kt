@@ -10,7 +10,7 @@ import com.squareup.okhttp.Response
 
 abstract class ApiResponseHandler <ViewState,Data>(
     private val  response: ApiResult<Data?>,
-    private val  stateEvent: StateEvent
+    private val  stateEvent: StateEvent?
 ){
 suspend fun getResult():DataState<ViewState>{
     return  when(response){

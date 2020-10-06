@@ -11,6 +11,8 @@ interface NoteDaoService {
     suspend fun searchNote(
     ): List<Note>
 
+    suspend fun getAllNotes():List<Note>
+
     suspend fun searchNotesOrderByDateDESC(
         query: String,
         page: Int,

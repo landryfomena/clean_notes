@@ -7,6 +7,7 @@ interface NoteCacheDataSource {
     suspend fun deleteNote(primaryKey: String): Int
     suspend fun deleteNotes(notes: List<Note>): Int
     suspend fun updateNote(primaryKey: String, newTitle: String, newBody: String?): Int
+    suspend fun getAllNotes(): List<Note>
     suspend fun searchNotes(
         query: String,
         filterAndOrder:
