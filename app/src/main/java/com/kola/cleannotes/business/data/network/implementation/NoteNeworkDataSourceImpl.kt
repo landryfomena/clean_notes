@@ -6,36 +6,53 @@ import com.kola.cleannotes.framework.datasource.network.abstraction.NoteFirestor
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
-class NoteNetworkDataSourceImpl @Inject constructor(
+class NoteNetworkDataSourceImpl
+@Inject
+constructor(
     private val firestoreService: NoteFirestoreService
-) : NoteNetworkDataSource {
-    override suspend fun insertOrUpdateNote(note: Note) = firestoreService.insertOrUpdateNote(note)
-    override suspend fun deleteNote(primaryKey: String) = firestoreService.deleteNote(primaryKey)
+): NoteNetworkDataSource {
 
-    override suspend fun insertDeletedNote(note: Note) = firestoreService.insertDeletedNote(note)
+    override suspend fun insertOrUpdateNote(note: Note) {
+        return firestoreService.insertOrUpdateNote(note)
+    }
 
-    override suspend fun insertDeletedNotes(notes: List<Note>) =
-        firestoreService.insertDeletedNotes(notes)
+    override suspend fun deleteNote(primaryKey: String) {
+        return firestoreService.deleteNote(primaryKey)
+    }
 
-    override suspend fun deleteDeletedNotes(notes: List<Note>) =
-        firestoreService.deleteDeletedNotes(notes)
+    override suspend fun insertDeletedNote(note: Note) {
+        return firestoreService.insertDeletedNote(note)
+    }
 
-    override suspend fun getDeletedNote() = firestoreService.getDeletedNote()
-
-    override suspend fun getDeletedNotes() = firestoreService.getDeletedNotes()
-
-    override suspend fun searchNote(note: Note) = firestoreService.searchNote(note)
-
-    override suspend fun getAllNotes() = firestoreService.getAllNotes()
-
-    override suspend fun insertOrUpdateNotes(notes: List<Note>) =
-        firestoreService.insertOrUpdateNotes(notes)
+    override suspend fun insertDeletedNotes(notes: List<Note>) {
+        return firestoreService.insertDeletedNotes(notes)
+    }
 
     override suspend fun deleteDeletedNote(note: Note) {
+        return firestoreService.deleteDeletedNote(note)
+    }
 
+    override suspend fun getDeletedNotes(): List<Note> {
+        return firestoreService.getDeletedNotes()
     }
 
     override suspend fun deleteAllNotes() {
+        firestoreService.deleteAllNotes()
     }
+
+    override suspend fun searchNote(note: Note): Note? {
+        return firestoreService.searchNote(note)
+    }
+
+    override suspend fun getAllNotes(): List<Note> {
+        return firestoreService.getAllNotes()
+    }
+
+    override suspend fun insertOrUpdateNotes(notes: List<Note>) {
+        return firestoreService.insertOrUpdateNotes(notes)
+    }
+
+
 }

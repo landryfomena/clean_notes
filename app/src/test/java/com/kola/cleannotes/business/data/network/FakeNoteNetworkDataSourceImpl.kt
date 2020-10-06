@@ -7,7 +7,7 @@ class FakeNoteNetworkDataSourceImpl
 constructor(
     private val notesData: HashMap<String, Note>,
     private val deletedNotesData: HashMap<String, Note>
-) : NoteNetworkDataSource {
+) : NoteNetworkDataSource{
 
     override suspend fun insertOrUpdateNote(note: Note) {
         notesData.put(note.id, note)
@@ -25,14 +25,6 @@ constructor(
         for(note in notes){
             deletedNotesData.put(note.id, note)
         }
-    }
-
-    override suspend fun deleteDeletedNotes(notes: List<Note>) {
-
-    }
-
-    override suspend fun getDeletedNote() {
-
     }
 
     override suspend fun deleteDeletedNote(note: Note) {

@@ -16,7 +16,7 @@ class FakeNoteCacheDataSourceImpl
 constructor(
     private val notesData: HashMap<String, Note>,
     private val dateUtil: DateUtil
-): NoteCacheDataSource {
+): NoteCacheDataSource{
 
     override suspend fun insertNote(note: Note): Long {
         if(note.id.equals(FORCE_NEW_NOTE_EXCEPTION)){
@@ -96,6 +96,10 @@ constructor(
             }
         }
         return results
+    }
+
+    override suspend fun getAllNotes(): List<Note> {
+        return ArrayList(notesData.values)
     }
 
     override suspend fun searchNoteById(id: String): Note? {
