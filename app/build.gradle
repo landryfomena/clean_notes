@@ -74,15 +74,18 @@ dependencies {
     implementation Dependencies.firebase_auth
     implementation Dependencies.firebase_crashlytics
     implementation Dependencies.retrofit_gson
+    implementation 'androidx.room:room-runtime:2.2.5'
 
     //annotation processing
     annotationProcessor AnnotationProcessing.dagger_compiler
+    annotationProcessor AnnotationProcessing.room_compiler
 
     //Unit test
     testImplementation TestDependencies.mockk
     testImplementation TestDependencies.jupiter_api
     testImplementation TestDependencies.jupiter_params
     testImplementation TestDependencies.junit4
+    annotationProcessor 'androidx.room:room-compiler:2.2.5'
     testRuntimeOnly TestDependencies.jupiter_engine
     testImplementation Dependencies.retrofit_gson
 

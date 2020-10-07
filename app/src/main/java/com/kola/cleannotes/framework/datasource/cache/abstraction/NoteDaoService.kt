@@ -1,7 +1,7 @@
 package com.kola.cleannotes.framework.datasource.cache.abstraction
 
 import com.kola.cleannotes.business.domain.model.Note
-import com.kola.cleannotes.framework.datasource.database.NOTE_PAGINATION_PAGE_SIZE
+import com.kola.cleannotes.framework.datasource.cache.database.NOTE_PAGINATION_PAGE_SIZE
 
 interface NoteDaoService {
     suspend fun insertNote(note: Note): Long

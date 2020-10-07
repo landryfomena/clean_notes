@@ -2,7 +2,7 @@ package com.kola.cleannotes.business.data.cache
 
 import com.kola.cleannotes.business.data.cache.abstraction.NoteCacheDataSource
 import com.kola.cleannotes.business.domain.model.Note
-import com.kola.cleannotes.framework.datasource.database.NOTE_PAGINATION_PAGE_SIZE
+import com.kola.cleannotes.framework.datasource.cache.database.NOTE_PAGINATION_PAGE_SIZE
 import com.kola.cleannotes.util.DateUtil
 
 const val FORCE_DELETE_NOTE_EXCEPTION = "FORCE_DELETE_NOTE_EXCEPTION"

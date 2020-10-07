@@ -10,7 +10,7 @@ import com.kola.cleannotes.business.domain.state.DataState
 import com.kola.cleannotes.business.interactions.notelist.SearchNote.Companion.SEARCH_NOTES_NO_MATCHING_RESULTS
 import com.kola.cleannotes.business.interactions.notelist.SearchNote.Companion.SEARCH_NOTES_SUCCESS
 import com.kola.cleannotes.di.DependencyContainer
-import com.kola.cleannotes.framework.datasource.database.ORDER_BY_ASC_DATE_UPDATED
+import com.kola.cleannotes.framework.datasource.cache.database.ORDER_BY_ASC_DATE_UPDATED
 import com.kola.cleannotes.framework.presentation.notelist.state.NoteListStateEvent.SearchNotesEvent
 import com.kola.cleannotes.framework.presentation.notelist.state.NoteListViewState
 import junit.framework.Assert.assertEquals
