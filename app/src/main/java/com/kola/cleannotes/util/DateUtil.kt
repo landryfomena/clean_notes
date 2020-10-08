@@ -11,22 +11,25 @@ import javax.inject.Singleton
 class DateUtil
 @Inject
 constructor(
-    private val dataFormat: SimpleDateFormat
-) {
-    // date format: "2019-07-23 HH:MM:SS"
-    fun removeTimeFromString(sd: String): String {
+    private val dateFormat: SimpleDateFormat
+)
+{
+    // Date format: "2019-07-23 HH:mm:ss"
+
+    fun removeTimeFromDateString(sd: String): String{
         return sd.substring(0, sd.indexOf(" "))
     }
 
-    fun convertFirebaseTimeStampToStringDate(timestamp: Timestamp): String {
-        return dataFormat.format(timestamp.toDate())
+    fun convertFirebaseTimestampToStringData(timestamp: Timestamp): String{
+        return dateFormat.format(timestamp.toDate())
     }
 
-    fun convertStringDateToFirebasetimeStamp(date: String): Timestamp {
-        return Timestamp(dataFormat.parse(date))
+    fun convertStringDateToFirebaseTimestamp(date: String): Timestamp{
+        return Timestamp(dateFormat.parse(date))
     }
 
-    fun getCurrentTimeStamp(): String {
-        return dataFormat.format(Date())
+    fun getCurrentTimestamp(): String {
+        return dateFormat.format(Date())
     }
+
 }

@@ -18,8 +18,8 @@ class NoteFactory @Inject constructor(private val dateUtil: DateUtil) {
             id = id ?: UUID.randomUUID().toString(),
             title = title,
             body = body ?: "",
-            created_at = dateUtil.getCurrentTimeStamp(),
-            updated_at = dateUtil.getCurrentTimeStamp()
+            created_at = dateUtil.getCurrentTimestamp(),
+            updated_at = dateUtil.getCurrentTimestamp()
         )
     }
 

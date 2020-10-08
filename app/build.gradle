@@ -1,8 +1,14 @@
 import dependencies.*
 
 apply plugin: 'com.android.application'
+
 apply plugin: 'kotlin-android'
+
 apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'kotlin-kapt'
+
+apply plugin: 'com.google.firebase.crashlytics'
 
 
 android {
@@ -38,15 +44,15 @@ android {
         jvmTarget = Java.java_version
     }
 
-    sourceSets{
-        test.resources.srcDirs +="src/test/res"
+    sourceSets {
+        test.resources.srcDirs += "src/test/res"
     }
 
-    testOptions {
+    /*testOptions {
         unitTests.all {
             useJunitPlatform()
         }
-    }
+    }*/
 }
 
 dependencies {
@@ -60,6 +66,7 @@ dependencies {
     implementation Dependencies.kotlin_coroutines_play_services
     implementation Dependencies.kotlin_coroutines
     implementation Dependencies.kotlin_coroutines_android
+    implementation Dependencies.room_ktx
 
     //support
     implementation SupportDependencies.appcompat
@@ -77,8 +84,12 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.2.5'
 
     //annotation processing
-    annotationProcessor AnnotationProcessing.dagger_compiler
-    annotationProcessor AnnotationProcessing.room_compiler
+    implementation 'com.google.firebase:firebase-analytics:17.5.0'
+    implementation 'com.google.firebase:firebase-auth:19.4.0'
+    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
+    kapt AnnotationProcessing.dagger_compiler
+    kapt AnnotationProcessing.room_compiler
+
 
     //Unit test
     testImplementation TestDependencies.mockk
@@ -90,3 +101,4 @@ dependencies {
     testImplementation Dependencies.retrofit_gson
 
 }
+apply plugin: 'com.google.gms.google-services'

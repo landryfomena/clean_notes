@@ -31,7 +31,7 @@ class NoteDaoServiceImpl @Inject constructor(
             primaryKey = primaryKey,
             title = newTitle,
             body = newBody,
-            updated_at = dateUtil.getCurrentTimeStamp()
+            updated_at = dateUtil.getCurrentTimestamp()
         )
     }
 

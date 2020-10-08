@@ -7,42 +7,49 @@ import com.kola.cleannotes.util.DateUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class CacheMapper @Inject constructor(
-):EntityMapper<NoteCacheEntity, Note>{
+/**
+ * Maps Note to NoteCacheEntity or NoteCacheEntity to Note.
+ */
+class CacheMapper
+@Inject
+constructor(
+    private val dateUtil: DateUtil
+): EntityMapper<NoteCacheEntity, Note>
+{
+
     fun entityListToNoteList(entities: List<NoteCacheEntity>): List<Note>{
-        val list:ArrayList<Note> =ArrayList()
-        for (entity in entities){
+        val list: ArrayList<Note> = ArrayList()
+        for(entity in entities){
             list.add(mapFromEntity(entity))
         }
         return list
     }
 
     fun noteListToEntityList(notes: List<Note>): List<NoteCacheEntity>{
-        val list:ArrayList<NoteCacheEntity> =ArrayList()
-        for (note in notes){
-            list.add(maToEntity(note))
+        val entities: ArrayList<NoteCacheEntity> = ArrayList()
+        for(note in notes){
+            entities.add(maToEntity(note))
         }
-        return list
+        return entities
     }
+
     override fun mapFromEntity(entity: NoteCacheEntity): Note {
         return Note(
-            id= entity.id,
+            id = entity.id,
             title = entity.title,
             body = entity.body,
-            created_at = entity.created_at,
-            updated_at = entity.updated_at
+            updated_at = entity.updated_at,
+            created_at = entity.created_at
         )
     }
 
     override fun maToEntity(domainModel: Note): NoteCacheEntity {
         return NoteCacheEntity(
-            id= domainModel.id,
+            id = domainModel.id,
             title = domainModel.title,
             body = domainModel.body,
-            created_at = domainModel.created_at,
-            updated_at = domainModel.updated_at
+            updated_at = domainModel.updated_at,
+            created_at = domainModel.created_at
         )
     }
-
 }
