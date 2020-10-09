@@ -26,13 +26,28 @@ class NoteDaoServiceImpl @Inject constructor(
         return noteDao.deleteNotes(ids)
     }
 
-    override suspend fun updateNote(primaryKey: String, newTitle: String, newBody: String): Int {
-        return noteDao.updateNote(
-            primaryKey = primaryKey,
-            title = newTitle,
-            body = newBody,
-            updated_at = dateUtil.getCurrentTimestamp()
-        )
+    override suspend fun updateNote(
+        primaryKey: String,
+        newTitle: String,
+        newBody: String,
+        timestamp: String?
+    ): Int {
+        return if (timestamp != null) {
+            noteDao.updateNote(
+                primaryKey = primaryKey,
+                title = newTitle,
+                body = newBody,
+                updated_at = timestamp
+            )
+        } else {
+            noteDao.updateNote(
+                primaryKey = primaryKey,
+                title = newTitle,
+                body = newBody,
+                updated_at = dateUtil.getCurrentTimestamp()
+            )
+        }
+
     }
 
     override suspend fun searchNote(): List<Note> {
@@ -50,7 +65,7 @@ class NoteDaoServiceImpl @Inject constructor(
     ): List<Note> {
         return noteMapper.entityListToNoteList(
             noteDao.searchNotesOrderByDateDESC(
-                query=query,
+                query = query,
                 page = page,
                 pageSize = pageSize
             )
@@ -64,7 +79,7 @@ class NoteDaoServiceImpl @Inject constructor(
     ): List<Note> {
         return noteMapper.entityListToNoteList(
             noteDao.searchNotesOrderByDateASC(
-                query=query,
+                query = query,
                 page = page,
                 pageSize = pageSize
             )
@@ -78,7 +93,7 @@ class NoteDaoServiceImpl @Inject constructor(
     ): List<Note> {
         return noteMapper.entityListToNoteList(
             noteDao.searchNotesOrderByTitleDESC(
-                query=query,
+                query = query,
                 page = page,
                 pageSize = pageSize
             )
@@ -92,7 +107,7 @@ class NoteDaoServiceImpl @Inject constructor(
     ): List<Note> {
         return noteMapper.entityListToNoteList(
             noteDao.searchNotesOrderByTitleASC(
-                query=query,
+                query = query,
                 page = page,
                 pageSize = pageSize
             )
@@ -121,7 +136,7 @@ class NoteDaoServiceImpl @Inject constructor(
     ): List<Note> {
         return noteMapper.entityListToNoteList(
             noteDao.returnOrderedQuery(
-                query=query,
+                query = query,
                 page = page,
                 filterAndOrder = filterAndOrder
             )

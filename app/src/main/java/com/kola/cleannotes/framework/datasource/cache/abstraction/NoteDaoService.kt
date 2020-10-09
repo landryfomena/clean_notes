@@ -1,5 +1,6 @@
 package com.kola.cleannotes.framework.datasource.cache.abstraction
 
+import com.google.firebase.firestore.ServerTimestamp
 import com.kola.cleannotes.business.domain.model.Note
 import com.kola.cleannotes.framework.datasource.cache.database.NOTE_PAGINATION_PAGE_SIZE
 
@@ -7,7 +8,7 @@ interface NoteDaoService {
     suspend fun insertNote(note: Note): Long
     suspend fun deleteNote(primaryKey: String): Int
     suspend fun deleteNotes(notes: List<Note>): Int
-    suspend fun updateNote(primaryKey: String, newTitle: String, newBody: String): Int
+    suspend fun updateNote(primaryKey: String, newTitle: String, newBody: String,timestamp:String? ): Int
     suspend fun searchNote(
     ): List<Note>
 

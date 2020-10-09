@@ -19,7 +19,8 @@ class SyncNotes(
 ) {
     suspend fun syncNotes() {
         val cachedNotesList = getCachedNotes()
-        syncNetorkNotesWithCachedNotes(ArrayList(cachedNotesList))
+        val networkNotesList= getNetworkNotes()
+        syncNetorkNotesWithCachedNotes(ArrayList(cachedNotesList),networkNotesList)
     }
 
     private suspend fun getCachedNotes(): List<Note> {
@@ -42,33 +43,30 @@ class SyncNotes(
         }.getResult()
         return response?.data ?: ArrayList()
     }
+private suspend fun getNetworkNotes():List<Note>{
+    val networkResult = safeApiCall(IO) {
+        noteNetworkDataSource.getAllNotes()
+    }
 
-    private suspend fun syncNetorkNotesWithCachedNotes(cachedNotes: ArrayList<Note>) =
+    val response = object : ApiResponseHandler<List<Note>, List<Note>>(
+        response = networkResult,
+        stateEvent = null
+    ) {
+        override suspend fun handleSuccess(resultObj: List<Note>): DataState<List<Note>> {
+            return DataState.data(response = null, data = resultObj, stateEvent = null)
+        }
+
+    }.getResult()
+    return  response?.data ?: ArrayList()
+}
+    private suspend fun syncNetorkNotesWithCachedNotes(cachedNotes: ArrayList<Note>,networkNotes:List<Note>) =
         withContext(IO) {
-            val networkResult = safeApiCall(IO) {
-                noteNetworkDataSource.getAllNotes()
-            }
-
-            val response = object : ApiResponseHandler<List<Note>, List<Note>>(
-                response = networkResult,
-                stateEvent = null
-            ) {
-                override suspend fun handleSuccess(resultObj: List<Note>): DataState<List<Note>> {
-                    return DataState.data(response = null, data = resultObj, stateEvent = null)
-                }
-
-            }.getResult()
-            val noteList = response?.data ?: ArrayList()
-
-            val job = launch {
-                for (note in noteList) {
+                for (note in networkNotes) {
                     noteCacheDataSource.searchNoteById(note.id)?.let { cachedNote ->
                         cachedNotes.remove(cachedNote)
                         checkIfCachedNoteRequiresUpdate(cachedNote, note)
                     } ?: noteCacheDataSource.insertNote(note)
                 }
-            }
-            job.join()
             for (cachedNote in cachedNotes) {
                 safeApiCall(IO) {
                     noteNetworkDataSource.insertOrUpdateNote(cachedNote)
@@ -86,7 +84,8 @@ class SyncNotes(
                 noteCacheDataSource.updateNote(
                     primaryKey = networkNote.id,
                     newTitle = networkNote.title,
-                    newBody = networkNote.body
+                    newBody = networkNote.body,
+                    timestamp = networkNote.updated_at
                 )
             }
         } else {

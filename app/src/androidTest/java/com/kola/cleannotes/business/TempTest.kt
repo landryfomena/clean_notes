@@ -22,7 +22,7 @@ class TempTest {
     lateinit var firebaseFirestore: FirebaseFirestore
 
     init {
-        (application.appComponent as TestAppComponent).inject(this)
+
     }
 
     @Test

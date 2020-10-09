@@ -3,6 +3,7 @@ package com.kola.cleannotes.business.data.cache.implementation
 import com.kola.cleannotes.business.data.cache.abstraction.NoteCacheDataSource
 import com.kola.cleannotes.business.domain.model.Note
 import com.kola.cleannotes.framework.datasource.cache.abstraction.NoteDaoService
+import java.security.Timestamp
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,9 +30,10 @@ constructor(
     override suspend fun updateNote(
         primaryKey: String,
         newTitle: String,
-        newBody: String?
+        newBody: String?,
+        timestamp: String?
     ): Int {
-        return noteDaoService.updateNote(primaryKey, newTitle, newBody?:"")
+        return noteDaoService.updateNote(primaryKey, newTitle, newBody?:"",timestamp)
     }
 
     override suspend fun searchNotes(

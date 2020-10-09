@@ -5,11 +5,13 @@ import com.kola.cleannotes.business.data.network.abstraction.NoteNetworkDataSour
 import com.kola.cleannotes.business.domain.model.Note
 import com.kola.cleannotes.business.domain.model.NoteFactory
 import com.kola.cleannotes.di.DependencyContainer
+import com.kola.cleannotes.framework.datasource.cache.database.ORDER_BY_ASC_DATE_UPDATED
+import com.kola.cleannotes.util.DateUtil
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.collections.ArrayList
@@ -35,7 +37,9 @@ Test cases:
     c) confirm cache reflects the updates
  */
 
+@InternalCoroutinesApi
 class SyncNotesTest {
+
     // system in test
     private val syncNotes: SyncNotes
 
@@ -44,6 +48,7 @@ class SyncNotesTest {
     private val noteCacheDataSource: NoteCacheDataSource
     private val noteNetworkDataSource: NoteNetworkDataSource
     private val noteFactory: NoteFactory
+    private val dateUtil: DateUtil
 
     init {
         dependencyContainer = DependencyContainer()
@@ -51,6 +56,7 @@ class SyncNotesTest {
         noteCacheDataSource = dependencyContainer.noteCacheDataSource
         noteNetworkDataSource = dependencyContainer.noteNetworkDataSource
         noteFactory = dependencyContainer.noteFactory
+        dateUtil = dependencyContainer.dateUtil
         syncNotes = SyncNotes(
             noteCacheDataSource = noteCacheDataSource,
             noteNetworkDataSource = noteNetworkDataSource
@@ -58,50 +64,137 @@ class SyncNotesTest {
     }
 
     @Test
-    fun insertNetworkNotesIntoCache() = runBlocking {
-        val newNotes = noteFactory.createNoteList(50)
-        noteNetworkDataSource.insertOrUpdateNotes(newNotes)
+    fun doSuccessiveUpdatesOccur() = runBlocking {
+
+        // update a single note with new timestamp
+        val newDate = dateUtil.getCurrentTimestamp()
+        val updatedNote = Note(
+            id = noteNetworkDataSource.getAllNotes().get(0).id,
+            title = noteNetworkDataSource.getAllNotes().get(0).title,
+            body = noteNetworkDataSource.getAllNotes().get(0).body,
+            created_at = noteNetworkDataSource.getAllNotes().get(0).created_at,
+            updated_at = newDate
+        )
+        noteNetworkDataSource.insertOrUpdateNote(updatedNote)
 
         syncNotes.syncNotes()
-        for (note in newNotes) {
-            val cachedNote = noteCacheDataSource.searchNoteById(note.id)
-            Assertions.assertTrue(cachedNote != null)
+
+        delay(1001)
+
+        // simulate launch app again
+        syncNotes.syncNotes()
+
+        // confirm the date was not updated a second time
+        val notes = noteNetworkDataSource.getAllNotes()
+        for(note in notes){
+            if(note.id.equals(updatedNote.id)){
+                assertTrue { note.updated_at.equals(newDate) }
+            }
         }
     }
 
     @Test
-    fun insertCachedNotesIntoNetwork() = runBlocking {
-        val newNotes = noteFactory.createNoteList(50)
-        noteCacheDataSource.insertNotes(newNotes)
+    fun checkUpdatedAtDates() = runBlocking {
+
+        // update a single note with new timestamp
+        val newDate = dateUtil.getCurrentTimestamp()
+        val updatedNote = Note(
+            id = noteNetworkDataSource.getAllNotes().get(0).id,
+            title = noteNetworkDataSource.getAllNotes().get(0).title,
+            body = noteNetworkDataSource.getAllNotes().get(0).body,
+            created_at = noteNetworkDataSource.getAllNotes().get(0).created_at,
+            updated_at = newDate
+        )
+        noteNetworkDataSource.insertOrUpdateNote(updatedNote)
+
+//        for(note in noteNetworkDataSource.getAllNotes()){
+//            println("date: ${note.updated_at}")
+//        }
+//        println("BREAK")
+
         syncNotes.syncNotes()
 
-        newNotes.forEach { note ->
-            val networkNote = noteNetworkDataSource.searchNote(note)
-            assertTrue(networkNote != null)
+        // confirm only a single 'updated_at' date was updated
+        val notes = noteNetworkDataSource.getAllNotes()
+        for(note in notes){
+            noteCacheDataSource.searchNoteById(note.id)?.let { n ->
+                println("date: ${n.updated_at}")
+                if(n.id.equals(updatedNote.id)){
+                    assertTrue { n.updated_at.equals(newDate) }
+                }
+                else{
+                    assertFalse { n.updated_at.equals(newDate) }
+                }
+            }
         }
+    }
 
+
+    @Test
+    fun insertNetworkNotesIntoCache() = runBlocking {
+
+        // prepare the scenario
+        // -> Notes in network are newer so they must be inserted into cache
+        val newNotes = noteFactory.createNoteList(50)
+        noteNetworkDataSource.insertOrUpdateNotes(newNotes)
+
+        // perform the sync
+        syncNotes.syncNotes()
+
+        // confirm the new notes were inserted into cache
+        for(note in newNotes){
+            val cachedNote = noteCacheDataSource.searchNoteById(note.id)
+            assertTrue { cachedNote != null }
+        }
+    }
+
+
+    @Test
+    fun insertCachedNotesIntoNetwork() = runBlocking {
+
+        // prepare the scenario
+        // -> Notes in cache are newer so they must be inserted into network
+        val newNotes = noteFactory.createNoteList(50)
+        noteCacheDataSource.insertNotes(newNotes)
+
+        // perform the sync
+        syncNotes.syncNotes()
+
+        // confirm the new notes were inserted into network
+        for(note in newNotes){
+            val networkNote = noteNetworkDataSource.searchNote(note)
+            assertTrue { networkNote != null }
+        }
     }
 
     @Test
     fun checkCacheUpdateLogicSync() = runBlocking {
-        val cachedNotes = noteCacheDataSource.searchNotes("", "", page = 1)
+
+        // select a few notes from cache and update the title and body
+        val cachedNotes = noteCacheDataSource.searchNotes(
+            query = "",
+            filterAndOrder = ORDER_BY_ASC_DATE_UPDATED,
+            page = 1
+        )
         val notesToUpdate: ArrayList<Note> = ArrayList()
-        for (note in cachedNotes) {
-            val updatNote = noteFactory.createSingleNote(
+        for(note in cachedNotes){
+            val updatedNote = noteFactory.createSingleNote(
                 id = note.id,
                 title = UUID.randomUUID().toString(),
                 body = UUID.randomUUID().toString()
             )
-
-            notesToUpdate.add(updatNote)
-            if (notesToUpdate.size > 4) {
+            notesToUpdate.add(updatedNote)
+            if(notesToUpdate.size > 3){
                 break
             }
         }
         noteCacheDataSource.insertNotes(notesToUpdate)
+
+        // perform sync
         syncNotes.syncNotes()
 
-        for (note in notesToUpdate) {
+        // confirm the updated notes were updated in the network
+        for(note in notesToUpdate){
             val networkNote = noteNetworkDataSource.searchNote(note)
             assertEquals(note.id, networkNote?.id)
             assertEquals(note.title, networkNote?.title)
@@ -112,30 +205,34 @@ class SyncNotesTest {
 
     @Test
     fun checkNetworkUpdateLogicSync() = runBlocking {
+
+        // select a few notes from network and update the title and body
         val networkNotes = noteNetworkDataSource.getAllNotes()
+
         val notesToUpdate: ArrayList<Note> = ArrayList()
-        for (note in networkNotes) {
-            val updatNote = noteFactory.createSingleNote(
+        for(note in networkNotes){
+            val updatedNote = noteFactory.createSingleNote(
                 id = note.id,
                 title = UUID.randomUUID().toString(),
                 body = UUID.randomUUID().toString()
             )
-
-            notesToUpdate.add(updatNote)
-            if (notesToUpdate.size > 4) {
+            notesToUpdate.add(updatedNote)
+            if(notesToUpdate.size > 3){
                 break
             }
         }
         noteNetworkDataSource.insertOrUpdateNotes(notesToUpdate)
+
+        // perform sync
         syncNotes.syncNotes()
 
-        for (note in notesToUpdate) {
-            val cachedNote = noteCacheDataSource.searchNoteById(note.id)
-            assertEquals(note.id, cachedNote?.id)
-            assertEquals(note.title, cachedNote?.title)
-            assertEquals(note.body, cachedNote?.body)
-            assertEquals(note.updated_at, cachedNote?.updated_at)
+        // confirm the updated notes were updated in the cache
+        for(note in notesToUpdate){
+            val cacheNote = noteCacheDataSource.searchNoteById(note.id)
+            assertEquals(note.id, cacheNote?.id)
+            assertEquals(note.title, cacheNote?.title)
+            assertEquals(note.body, cacheNote?.body)
+            assertEquals(note.updated_at, cacheNote?.updated_at)
         }
     }
-
 }
