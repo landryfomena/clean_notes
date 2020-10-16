@@ -1,6 +1,7 @@
 package com.kola.cleannotes.di
 
 import com.kola.cleannotes.business.TempTest
+import com.kola.cleannotes.framework.datasource.cache.NoteDaoServiceTest
 import com.kola.cleannotes.framework.datasource.network.NoteFirestoreServiceTests
 import com.kola.cleannotes.framework.presentation.TestBaseApplication
 import dagger.BindsInstance
@@ -24,4 +25,5 @@ interface TestAppComponent: AppComponent{
     }
 
     fun inject(tempTest: NoteFirestoreServiceTests)
+    fun inject(tempTest: NoteDaoServiceTest)
 }
